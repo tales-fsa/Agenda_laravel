@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Agenda;
 use Illuminate\Http\Request;
+use App\Http\Requests\AgendaRequest;
 
 class AgendaController extends Controller
 {
@@ -30,7 +31,7 @@ class AgendaController extends Controller
     }
 
     /**
-     * Insersão de dados no banco.
+     * Insersão de dados no banco de dados.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -43,24 +44,49 @@ class AgendaController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Mostra o formulário preenchido para alteração.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Agenda $agenda, int $id)
     {
-        //
+        $agenda = Agenda::FindOrFail($id);
+
+        return view('agenda.edit')->with('agenda', $agenda);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Atualiza um registro no banco de dados
+     *
+     * @param AgendaRequest $request
+     * @param integer $id
+     * @return void
+     */
+    public function update(AgendaRequest $request, int $id)
+    {
+        $agenda = Agenda::FindOrFail($id);
+
+        $agenda->update([
+            'nome' => $request->nome,
+            'telefone' => $request->telefone
+        ]);
+
+        return redirect()->route('agenda.index')->with('mensagem', 'Cadastro editado com sucesso!');;
+    }
+
+    /**
+     * Remove o registro do banco de dados.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        //
+        $agenda = Agenda::FindOrFail($id);
+
+        $agenda->delete();
+
+        return redirect()->route('agenda.index')->with('mensagem', 'Cadastro deletado com sucesso!');
     }
 }
